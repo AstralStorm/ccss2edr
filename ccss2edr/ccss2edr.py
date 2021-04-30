@@ -42,22 +42,22 @@ def main():
 
     edr_header.creation_tool = 'ccss2edr'
 
-    if 'DESCRIPTOR' in ccss and ccss['DESCRIPTOR'] != 'Not specified':
+    if 'DESCRIPTOR' in ccss and ccss['DESCRIPTOR'] != b'Not specified':
         edr_header.display_description = ccss['DESCRIPTOR']
     elif 'DISPLAY' in ccss:
         edr_header.display_description = ccss['DISPLAY']
     if 'ORIGINATOR' in ccss:
-        edr_header.creation_tool += ' ({})'.format(ccss['ORIGINATOR'])
+        edr_header.creation_tool += ' ({})'.format(ccss['ORIGINATOR'].decode('utf-8'))
     if 'CREATED' in ccss:
-        edr_header.creation_time = time.mktime(unasctime(ccss['CREATED']))
+        edr_header.creation_time = int(time.mktime(unasctime(ccss['CREATED'].decode('utf-8'))))
     if 'MANUFACTURER_ID' in ccss:
         edr_header.display_manufacturer_id = ccss['MANUFACTURER_ID']
     if 'MANUFACTURER' in ccss:
         edr_header.display_manufacturer = ccss['MANUFACTURER']
     if args.tech_type:
-        edr_header.tech_type = args.tech_type
+        edr_header.tech_type = args.tech_type.encode('utf-8')
     elif 'TECHNOLOGY' in ccss:
-        tech = ccss['TECHNOLOGY']
+        tech = ccss['TECHNOLOGY'].decode('utf-8')
         if (not tech in TECH_STRINGS_TO_INDEX and
             tech[-4:] in (" IPS", " VPA", " TFT")):
             tech = tech[:-4]
@@ -66,6 +66,7 @@ def main():
         else:
             print('Warning: Unknown technology %r' % tech)
 
+    edr_header.creation_tool = edr_header.creation_tool.encode('utf-8')
     edr_header.spectral_start_nm = float(ccss['SPECTRAL_START_NM'])
     edr_header.spectral_end_nm = float(ccss['SPECTRAL_END_NM'])
     edr_header.spectral_space = (edr_header.spectral_end_nm -
@@ -73,6 +74,7 @@ def main():
                                      int(ccss['SPECTRAL_BANDS']) - 1)
 
     edr_header.num_sets = int(ccss['NUMBER_OF_SETS'])
+    print(edr_header)
 
     args.out.write(EDRHeaderFactory.pack(edr_header))
 
@@ -87,8 +89,8 @@ def main():
 
         # strip leading SAMPLE_ID and convert from mW/nm/m^2 to W/nm/m^2
         data = [float(val) / 1000.0 for val in ccss.data[set_num][1:]]
-	for spectral_measurment_data in data:
-	    args.out.write(struct.pack('<d',spectral_measurment_data))
+        for spectral_measurment_data in data:
+            args.out.write(struct.pack('<d',spectral_measurment_data))
 
 
 def unasctime(timestr):

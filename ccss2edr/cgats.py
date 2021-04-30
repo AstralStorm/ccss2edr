@@ -18,7 +18,7 @@ class CGATS(Mapping):
         parsing_data_format = False
 
         for line in file:
-            tok = shlex.split(line)
+            tok = [x.encode('utf-8') for x in shlex.split(line)]
 
             if not read_first_line:
                 self.filetype = tok
@@ -28,15 +28,15 @@ class CGATS(Mapping):
             if not tok:
                 continue
 
-            if tok[0] == 'KEYWORD':
+            if tok[0] == b'KEYWORD':
                 self.keywords.append(tok[1])
-            elif tok[0] == 'BEGIN_DATA':
+            elif tok[0] == b'BEGIN_DATA':
                 parsing_data = True
-            elif tok[0] == 'END_DATA':
+            elif tok[0] == b'END_DATA':
                 parsing_data = False
-            elif tok[0] == 'BEGIN_DATA_FORMAT':
+            elif tok[0] == b'BEGIN_DATA_FORMAT':
                 parsing_data_format = True
-            elif tok[0] == 'END_DATA_FORMAT':
+            elif tok[0] == b'END_DATA_FORMAT':
                 parsing_data_format = False
             elif parsing_data:
                 self.data.append(tok)
@@ -46,7 +46,7 @@ class CGATS(Mapping):
                 self.params[tok[0]] = tok[1]
 
     def __getitem__(self, key):
-        return self.params[key]
+        return self.params[key.encode('utf-8')]
 
     def __iter__(self):
         return iter(self.params)

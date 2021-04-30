@@ -1,6 +1,6 @@
 import time
 import struct
-from record import recordtype
+from .record import recordtype
 
 
 TECH = {
@@ -33,7 +33,7 @@ TECH = {
     64: 'LCD GB-R Phosphor IPS'
 }
 
-TECH_STRINGS_TO_INDEX = dict((v, k) for k, v in TECH.iteritems())
+TECH_STRINGS_TO_INDEX = dict((v, k) for k, v in TECH.items())
 
 
 class StructFactoryMeta(type):
@@ -98,17 +98,17 @@ class EDRHeaderFactory(StructFactory):
         'unknown_0x248'
     ])
     defaults = (
-        'EDR DATA1',
+        b'EDR DATA1',
         1,
         1,
         int(time.time()),
         'edr.py',
-        '',
+        b'',
         1,
         0,
-        '',
-        '',
-        '',
+        b'',
+        b'',
+        b'',
         0,
         1,
         1,
@@ -135,11 +135,11 @@ class EDRDisplayDataHeaderFactory(StructFactory):
         'Yxy_z_internal'  # gets set to zero when edr is read?
     ])
     defaults = (
-        'DISPLAY DATA',
+        b'DISPLAY DATA',
         255,
         255,
         255,
-        'c',
+        b'c',
         0.0,
         0.0,
         0.0,
@@ -157,9 +157,9 @@ class EDRSpectralDataHeaderFactory(StructFactory):
         'unknown_0x24'
     ])
     defaults = (
-        'SPECTRAL DATA',
+        b'SPECTRAL DATA',
         0,
         0,
-        '0000'
+        b'0000'
     )
     struct = struct.Struct('< 13s3x I I 4s')
